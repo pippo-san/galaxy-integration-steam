@@ -2,7 +2,7 @@ import asyncio
 import logging
 import ssl
 from contextlib import suppress
-from typing import Callable, List, Any, Dict, Union, Coroutine
+from typing import Callable, List, Any, Dict, Union, Coroutine, cast
 from urllib import parse
 from pprint import pformat
 
@@ -255,7 +255,7 @@ class SteamNetworkBackend(BackendInterface):
         params = parse.parse_qs(parsed_url.query)
         if ("code" not in params):
             return next_step_response_simple(fallback, True)
-        code = params["code"][0]
+        code = cast(str, params["code"][0]).strip()
         await self._websocket_client.communication_queues["websocket"].put({'mode': AuthCall.UPDATE_TWO_FACTOR, 'two-factor-code' : code, 'two-factor-method' : method })
         result = await self._get_websocket_auth_step()
         if (result == UserActionRequired.NoActionConfirmLogin):
